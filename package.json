@@ -1,0 +1,37 @@
+{
+  "name": "cobble",
+  "version": "1.0.0",
+  "description": "tiny composition utils for doing object inheritence",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/theporchrat/cobble.git"
+  },
+  "keywords": [
+    "composition",
+    "cobble",
+    "inheritance",
+    "aspect",
+    "descriptor"
+  ],
+  "author": "Jason Quense @theporchrat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/theporchrat/cobble/issues"
+  },
+  "homepage": "https://github.com/theporchrat/cobble",
+  "dependencies": {
+    "lodash": "^2.4.1"
+  },
+  "devDependencies": {
+    "sinon-chai": "^2.5.0",
+    "chai": "^1.9.1",
+    "sinon": "^1.10.3",
+    "mocha": "^1.21.4",
+    "gulp-mocha": "^1.0.0",
+    "gulp": "^3.8.7"
+  }
+}

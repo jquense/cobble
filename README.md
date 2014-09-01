@@ -23,7 +23,7 @@ compose a bunch of object literals into a single new object. `composeInto()` mut
     console.log(mixinA.b) //=> true
 
 ### Descriptors
-Descriptors are function helpers for telling cobble how to handle conflicts between properties. By default, conflicting properties will be overrideen by a later property in the chain
+Descriptors are function helpers for telling cobble how to handle conflicts between properties. By default, conflicting properties will be overridden by a later property in the chain
     
     var mixinA = { greet: function(){ console.log('first one!') } }
       , mixinB = { greet: function(){ console.log('second one!') } }
@@ -44,7 +44,7 @@ we can adjust the behaviour by using a descriptor to hint at how cobble should c
     result.greet() //=> 'second one!' 
                    //   'first one!'
 
-Cobble will rsolve conflicts in order, and keep track of conflict values so they can be resolved at once. This means that when composing a bunch of objects with conflicts you can provide one resolution strategy for all conflicting values in a chain, instead of each one individually
+Cobble will resolve conflicts in order, and keep track of conflict values so they can be resolved at once. This means that when composing a bunch of objects with conflicts you can provide one resolution strategy for all conflicting values in a chain, instead of each one individually
 
 consider the following composition:
 
@@ -98,7 +98,8 @@ is the same as:
                 console.log('e\'llo')    
             })
         });
-    
+
+
 #### Cobble comes with a few descriptors already:
 
 `before(method)` - wraps the provided method before the previous method(s) of the same property  

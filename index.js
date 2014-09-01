@@ -1,53 +1,42 @@
 var _ = require('lodash')
-  , apply = require('./lib/apply')
   , invariant = require('./lib/invariant')
   , descriptors = require('./lib/descriptors')
 
-module.exports = _.extend({
+/**
+ * compose objects into a new object, leaving the original objects untouched
+ * @param {...object} an object to be composed.
+ * @return {object}
+ */     
+function compose(){
+  var args = _.toArray(arguments)
+    , result = {}
+    , propHash = {};
 
-  compose: function(){
-    var args = _.toArray(arguments)
-      , result = {};
+  for(var i = 0; i < args.length; i++)
+    mixInto(result, args[i], propHash)
 
-    for(var i = 0; i < args.length; i++)
-      mixInto(result, args[i])
+  checkRequired(result)
 
-    checkRequired(result)
+  return result
+}
 
-    return result
-  },
+/**
+ * compose arguments into the first arg, mutating it
+ * @param  {objects target
+ * @param  {...objects} object to merge into the target object
+ * @return {object}
+ */
+function composeInto(first){
+  var args = _.rest(arguments)
+    , propHash = {};
 
-  extends: function(parent){
-    var args = _.rest(arguments)
-      , proto, child;
+  for(var i = 0; i < args.length; i++)
+    mixInto(first, args[i], propHash)
 
-    proto = Object.create(parent.prototype, {
-      constructor: {
-        value: child, enumerable: false, writable: true, configurable: true
-      }
-    })
+  checkRequired(first)
 
-    for(var i = 0; i < args.length; i++)
-      mixInto(proto, args[i])
-
-    child = _.has(proto, 'constructor')
-      : proto.constructor
-      ? function (){ return apply(parent, this, arguments) };
-
-    child.prototype = proto
-
-    return child
-  }
-
-}, descriptors)
-
-// function Cobble(base){
-//   var mixins = _.toArray(arguments)
-//     , proto  = _.last(mixins)
-
-//     if ( typeof base)
-// }
-
+  return first
+}
 
 /**
  * composes two objects mutating the first
@@ -55,11 +44,11 @@ module.exports = _.extend({
  * @param  {object} target
  * @return {object}
  */
-function mixInto(src, target){
+function mixInto(src, target, propHash){
   var key, val, inSrc, isRequired, decorator;
 
   _.each(target, function(value, key){
-    define(value, key, src)
+    define(value, key, src, propHash)
   })
 }
 
@@ -69,13 +58,20 @@ function mixInto(src, target){
  * @param  {string} key
  * @param  {object} src
  */
-function define(value, key, src){
+function define(value, key, src, propHash){
   var inSrc = _.has(src, key)
     , isRequired = value === descriptors.required
-    , isDescriptor = value instanceof descriptors.Descriptor;
+    , isDescriptor = value instanceof descriptors.Descriptor
+    , prev;
 
-  if ( !isRequired && isDescriptor ) 
-    return define(value.resolve.call(src, key), key, src)
+  if ( !isRequired ) 
+    if ( isDescriptor) {
+      prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
+      //console.log(prev, propHash[key])
+      return define(value.resolve.call(src, key, prev), key, src, propHash)
+    }
+    else
+      add(propHash, key, value)
 
   Object.defineProperty(src, key, {
     enumerable: true, 
@@ -86,32 +82,22 @@ function define(value, key, src){
 }
 
 function checkRequired(obj){
-  var required = _.where(result, function(v){ 
+  var required = _.keys(_.pick(obj, function(v){ 
       return v === descriptors.required 
-    })
+    }))
 
   invariant( required.length === 0
     , "Unmet required properties: %s", required.join(', '))
 }
 
-//cobble(base, mixin, mixin, mixin, proto)
+function add(obj, key, value) {
+  obj[key] = (obj[key] || [])
+  obj[key].push(value)
+}
 
-function inherit(parent, protoProps, staticProps) {
-    var child = function (){ return apply(parent, this, arguments) };
+module.exports = _.extend({
 
-    child = _.has(protoProps, 'constructor')
-        ? protoProps.constructor
-        : child
-    
-    _.extend(child, parent, staticProps)
+  compose: compose,
+  composeInto: composeInto,
 
-    child.prototype = Object.create(parent.prototype, {
-      constructor: {
-        value: child, enumerable: false, writable: true, configurable: true
-      }
-    })
-
-    _.extend(child.prototype, protoProps)
-    
-    return child
-};
+}, descriptors)

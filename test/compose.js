@@ -54,8 +54,7 @@ describe(' when composing objects together', function(){
     })
 
     it( 'should execute the descriptor', function(){
-      var method = function(){}
-        , result;
+      var result;
 
       result = cobble.compose({
           a: function(){ throw new Error }
@@ -67,6 +66,23 @@ describe(' when composing objects together', function(){
         })
 
       result.a.should.equal(true)
+    })
+
+    it( 'should warn about missing required properties', function(){
+      var result, st;
+
+      if ( console.warn.restore ) console.warn.restore()
+
+      st = sinon.stub(console, 'warn', function(){})
+
+      result = cobble.compose(
+        { a: cobble.required }, 
+        { b: true })
+
+      result.a.should.equal(cobble.required)
+      st.should.have.been.calledOnce
+
+      console.warn.restore()
     })
   })
 })

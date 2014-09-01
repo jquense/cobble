@@ -9,59 +9,111 @@ chai.should();
 
 describe(' when using descriptors', function(){
 
-  it( 'should call the new method before the old', function(){
-    var method = function(){}
-      , result, i = 1;
+  it( 'should only resolve a prop once', function(){
+    var result
+      , spyA = sinon.spy()
+      , spyB = sinon.spy()
+      , spyC = sinon.spy()
+      , spyD = sinon.spy();
 
     result = cobble.compose(
-        { a: function mult(){ i = 4 } }
-      , { a: cobble.before(function(){ 
-        i.should.equal(1)
-        i = 2 
-      }) 
-    }).a()
+        { prop: spyA }
+      , { prop: spyB }
+      , { prop: cobble.before(spyC) }
+      , { prop: cobble.after(spyD) })
 
-    i.should.equal(4)
+      result.prop()
 
+      spyA.should.have.been.calledOnce
+      spyB.should.have.been.calledOnce
+      spyC.should.have.been.calledBefore(spyA).and.calledOnce
+      spyD.should.have.been.calledAfter(spyC).and.calledOnce
+  })
+
+  it( 'should work without a specified method', function(){
+    var result
+      , spyA = sinon.spy()
+      , spyB = sinon.spy()
+      , spyC = sinon.spy()
+      , spyD = sinon.spy();
+
+    result = cobble.compose(
+        { prop: spyA }
+      , { prop: spyB }
+      , { prop: spyC }
+      , { prop: cobble.chain() })
+
+      result.prop()
+
+      spyA.should.have.been.calledOnce
+      spyB.should.have.been.calledAfter(spyA).and.calledOnce
+      spyC.should.have.been.calledAfter(spyB).and.calledOnce
+  })
+
+  it( 'should call the new method before the old', function(){
+    var result, i
+      , spyA = sinon.spy(), spyB = sinon.spy(), spyC = sinon.spy();
+
+    result = cobble.compose(
+        { a: spyA }
+      , { a: spyB }
+      , { a: cobble.before(spyC) })
+
+      result.a()
+
+      spyC.should.have.been.calledBefore(spyA).and.calledOnce
+      spyA.should.have.been.calledBefore(spyB).and.calledOnce
+      spyB.should.have.been.calledOnce
   })
 
   it( 'should call the new method after the old', function(){
-    var method = function(){}
-      , result, i;
+    var result, i
+      , spyA = sinon.spy(), spyB = sinon.spy(), spyC = sinon.spy();
 
     result = cobble.compose(
-        { a: function(){ i = 1 } }
-      , { a: cobble.after(function(){ 
-        i.should.equal(1)
-        i = 0 
-      }) 
-    }).a()
+        { a: spyA }
+      , { a: spyB }
+      , { a: cobble.after(spyC) })
 
-    i.should.equal(0)
+      result.a()
+      spyC.should.have.been.calledAfter(spyB).and.calledOnce
+      spyB.should.have.been.calledAfter(spyA).and.calledOnce
+      spyA.should.have.been.calledOnce
   })
   
   it( 'should call the new method around the old', function(){
-    var method = function(){}
-      , result, i = 0;
+    var result, spyA = sinon.spy(), spyB = sinon.spy(), spyC;
 
     result = cobble.compose(
-        { a: function(){ i = 1 } }
-      , { a: cobble.around(function(old){ 
+        { a: spyA }
+      , { a: spyB }
+      , { a: cobble.around(spyC = sinon.spy(function(wrapped){
+            spyA.should.have.not.been.called
+            spyB.should.have.not.been.called
+            wrapped.call(this)
+          })) 
+        })
 
-        i.should.equal(0)
-        old.should.be.a('function')
-        old.call(this)
-        i.should.equal(1)
-        i = 4
-      }) 
-    }).a()
+      result.a()
+      spyC.should.have.been.calledBefore(spyA).and.have.been.calledOnce
+      spyB.should.have.been.calledAfter(spyA).and.calledOnce
+      spyA.should.have.been.calledOnce
+  })
 
-    i.should.equal(4)
+  it( 'should concat array', function(){
+    var mixinA = { a: [1,2,3] }
+      , result = cobble.compose(
+          mixinA,
+          {
+            a: cobble.concat([4,5])
+          });
+
+    result.a.length.should.equal(5)
+    result.a[4].should.equal(5)
   })
 
   it( 'should take from a different key', function(){
-    var method = function(){}
-      , obj = { a: true, c: false, d: 'hi' }
+    var obj = { a: true, c: false, d: 'hi' }
       , result;
 
     result = cobble.compose(

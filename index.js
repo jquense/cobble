@@ -8,7 +8,7 @@ var _ = require('lodash')
  * @return {object}
  */     
 function compose(){
-  var args = _.toArray(arguments)
+  var args = _.flatten(arguments, true)
     , result = {}
     , propHash = {};
 
@@ -27,7 +27,7 @@ function compose(){
  * @return {object}
  */
 function composeInto(first){
-  var args = _.rest(arguments)
+  var args = _.rest(_.flatten(arguments, true))
     , propHash = {};
 
   for(var i = 0; i < args.length; i++)

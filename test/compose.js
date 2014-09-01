@@ -9,9 +9,24 @@ chai.should();
 
 describe(' when composing objects together', function(){
 
+  it( 'should handle arrays', function(){
+    var result;
+
+    result = cobble.compose({ a: false, b: 5 }, [{ a: true }, { a: 'hi' }])
+
+    result.a.should.equal('hi')
+    Object.keys(result).length.should.equal(2)
+
+    
+    result = cobble.compose([{ a: false, b: 5 }, { a: [1] }])
+
+    result.a[0].should.equal(1)
+    Object.keys(result).length.should.equal(2)
+  })
+
+
   it( 'should have all properties', function(){
-    var method = function(){}
-      , result;
+    var result;
 
     result = cobble.compose({ a: false, b: 5 }, { a: true })
 
@@ -19,8 +34,7 @@ describe(' when composing objects together', function(){
   })
 
   it( 'should not mutate any inputs', function(){
-    var method = function(){}
-      , one = { a: false }
+    var one = { a: false }
       , two = { a: true }
       , result;
 
@@ -32,8 +46,7 @@ describe(' when composing objects together', function(){
   })
 
   it( 'should override earlier properties my default', function(){
-    var method = function(){}
-      , result;
+    var result;
 
     result = cobble.compose({ a: false, }, { a: true })
     result.a.should.equal(true)

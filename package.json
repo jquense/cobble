@@ -1,6 +1,6 @@
 {
   "name": "cobble",
-  "version": "0.0.3",
+  "version": "0.15.0",
   "description": "tiny composition utils useful as a mixin system",
   "main": "index.js",
   "scripts": {

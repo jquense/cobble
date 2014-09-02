@@ -47,6 +47,7 @@ function composeInto(first){
 function mixInto(src, target, propHash){
   var key, val, inSrc, isRequired, decorator;
 
+  //console.log(src.traits)
   _.each(target, function(value, key){
     define(value, key, src, propHash)
   })
@@ -59,19 +60,23 @@ function mixInto(src, target, propHash){
  * @param  {object} src
  */
 function define(value, key, src, propHash){
-  var inSrc = _.has(src, key)
+  var inSrc = key in src
     , isRequired = value === descriptors.required
     , isDescriptor = value instanceof descriptors.Descriptor
     , prev;
 
   if ( !isRequired ) 
+    if ( inSrc && (!propHash[key] || !_.contains(propHash[key], src[key])) ) 
+      add(propHash, key, src[key])
+
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
-      //console.log(prev, propHash[key])
       return define(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
       add(propHash, key, value)
+    
+      
 
   Object.defineProperty(src, key, {
     enumerable: true, 

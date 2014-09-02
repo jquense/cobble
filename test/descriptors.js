@@ -100,6 +100,25 @@ describe(' when using descriptors', function(){
       spyA.should.have.been.calledOnce
   })
 
+  it( 'should reduce values', function(){
+    var spanish = { greet: function(){ return "hola" } }
+      , german  = { greet: function(){ return "guten morgen" } }
+
+      , result = cobble.compose(spanish, german, {
+
+          greet: cobble.reduce(function(target, next) {
+            return function(){
+              return target() + " " + next()
+            }
+          }, englishHello)
+
+        });
+
+    result.greet().should.equal("hello hola guten morgen")
+
+    function englishHello(){ return "hello" }
+  })
+
   it( 'should concat array', function(){
     var mixinA = { a: [1,2,3] }
       , result = cobble.compose(

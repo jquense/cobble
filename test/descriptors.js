@@ -22,12 +22,33 @@ describe(' when using descriptors', function(){
       , { prop: cobble.before(spyC) }
       , { prop: cobble.after(spyD) })
 
-      result.prop()
+    result.prop()
 
-      spyA.should.have.been.calledOnce
-      spyB.should.have.been.calledOnce
-      spyC.should.have.been.calledBefore(spyA).and.calledOnce
-      spyD.should.have.been.calledAfter(spyC).and.calledOnce
+    spyA.should.have.been.calledOnce
+    spyB.should.have.been.calledOnce
+    spyC.should.have.been.calledBefore(spyA).and.calledOnce
+    spyD.should.have.been.calledAfter(spyC).and.calledOnce
+  })
+
+  it( 'should resolve proto props once', function(){
+    var result
+      , spyA = sinon.spy()
+      , spyB = sinon.spy()
+      , spyC = sinon.spy()
+      , spyD = sinon.spy();
+
+    result = cobble.composeInto(
+        Object.create({ prop: spyA })
+      , { prop: spyB }
+      , { prop: cobble.before(spyC) }
+      , { prop: cobble.after(spyD) })
+
+    result.prop()
+
+    spyA.should.have.been.calledOnce
+    spyB.should.have.been.calledOnce
+    spyC.should.have.been.calledBefore(spyA).and.calledOnce
+    spyD.should.have.been.calledAfter(spyC).and.calledOnce
   })
 
   it( 'should work without a specified method', function(){

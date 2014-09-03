@@ -49,6 +49,9 @@ function mixInto(src, target, propHash){
 
   //console.log(src.traits)
   _.each(target, function(value, key){
+    if ( value !== descriptors.required && (key in src) && (!propHash[key] || !_.contains(propHash[key], src[key])) ) 
+        add(propHash, key, src[key])
+
     define(value, key, src, propHash)
   })
 }
@@ -66,8 +69,6 @@ function define(value, key, src, propHash){
     , prev;
 
   if ( !isRequired ) 
-    if ( inSrc && (!propHash[key] || !_.contains(propHash[key], src[key])) ) 
-      add(propHash, key, src[key])
 
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts

@@ -13,7 +13,7 @@ function compose(){
     , propHash = {};
 
   for(var i = 0; i < args.length; i++)
-    mixInto(result, args[i], propHash)
+    mergeInto(result, args[i], propHash)
 
   checkRequired(result)
 
@@ -31,7 +31,7 @@ function composeInto(first){
     , propHash = {};
 
   for(var i = 0; i < args.length; i++)
-    mixInto(first, args[i], propHash)
+    mergeInto(first, args[i], propHash)
 
   checkRequired(first)
 
@@ -44,12 +44,15 @@ function composeInto(first){
  * @param  {object} target
  * @return {object}
  */
-function mixInto(src, target, propHash){
-  var key, val, inSrc, isRequired, decorator;
+function mergeInto(src, target, propHash){
+  
 
   //console.log(src.traits)
   _.each(target, function(value, key){
-    if ( value !== descriptors.required && (key in src) && (!propHash[key] || !_.contains(propHash[key], src[key])) ) 
+    var inSrc = key in src
+      , isRequired = value === descriptors.required;
+
+    if ( !isRequired && inSrc && ( !propHash[key] || !_.contains(propHash[key], src[key]) )) 
         add(propHash, key, src[key])
 
     define(value, key, src, propHash)
@@ -105,5 +108,7 @@ module.exports = _.extend({
 
   compose: compose,
   composeInto: composeInto,
+
+  mergeInto: mergeInto
 
 }, descriptors)

@@ -16,13 +16,15 @@ require the module;
   var cobble = require('cobble')
 
 ### cobble(...objects)
-compose a bunch of object literals into a single new object. `cobble()` does not mutate any of the arguments
+compose a bunch of object literals into a single new object. `cobble()` does not mutate any of the arguments. 
 
     var first = { isCool: true }
       , second = { isAwesome: true }
       , result = cobble(first, second);
 
     result.isCool && result.isAwesome // => true
+
+**note:** you can pass in arrays of objects as well and cobble will flatten them appropriately: `cobble([ first, second], third, [fourth, fifth])` saves needing to use `apply()` in most cases
 
 ### cobble.into(target, ...objects)
 compose a bunch of object literals into a single new object. `.into()` mutates the first argument, useful for composing into an existing object, or a prototype.
@@ -32,6 +34,8 @@ compose a bunch of object literals into a single new object. `.into()` mutates t
 
     cobble.into(first, second)
     first.hasOwnProperty('isAwesome') //=> true
+
+**note:** you can pass in arrays of objects as well and cobble will flatten them appropriately: `cobble.into([ first, second], third, [fourth, fifth])` saves needing to use `apply()` in most cases
 
 ### Descriptors
 Descriptors are function helpers for telling cobble how to handle conflicts between properties. By default, conflicting properties will be overridden by a later property in the chain

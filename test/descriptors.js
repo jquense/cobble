@@ -87,6 +87,24 @@ describe(' when using descriptors', function(){
       spyB.should.have.been.calledOnce
   })
 
+  it( 'should compose before the old', function(){
+    var result, i
+      , spyA = sinon.spy(function( last ){ return last + " A" })
+      , spyB = sinon.spy(function( last ){ return last + " B" })
+      , spyC = sinon.spy(function( last ){ return last + " C" });
+
+    result = cobble.compose(
+        { a: spyA }
+      , { a: spyB }
+      , { a: cobble.composeBefore(spyC) })
+
+      result.a('start').should.equal('start C A B')
+
+      spyC.should.have.been.calledBefore(spyA).and.calledOnce.and.calledWith("start")
+      spyA.should.have.been.calledBefore(spyB).and.calledOnce.and.calledWith("start C")
+      spyB.should.have.been.calledOnce.and.calledWith("start C A")
+  })
+
   it( 'should call the new method after the old', function(){
     var result, i
       , spyA = sinon.spy(), spyB = sinon.spy(), spyC = sinon.spy();
@@ -102,6 +120,24 @@ describe(' when using descriptors', function(){
       spyA.should.have.been.calledOnce
   })
   
+  it( 'should compose after the old', function(){
+    var result, i
+      , spyA = sinon.spy(function( last ){ return last + " A" })
+      , spyB = sinon.spy(function( last ){ return last + " B" })
+      , spyC = sinon.spy(function( last ){ return last + " C" });
+
+    result = cobble.compose(
+        { a: spyA }
+      , { a: spyB }
+      , { a: cobble.composeAfter(spyC) })
+
+      result.a('start').should.equal('start A B C')
+
+      spyC.should.have.been.calledAfter(spyB).and.calledOnce.and.calledWith("start A B")
+      spyB.should.have.been.calledAfter(spyA).and.calledOnce.and.calledWith("start A")
+      spyA.should.have.been.calledOnce.and.calledWith("start")
+  })
+
   it( 'should call the new method around the old', function(){
     var result, spyA = sinon.spy(), spyB = sinon.spy(), spyC;
 

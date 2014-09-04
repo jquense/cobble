@@ -16,7 +16,7 @@ describe(' when using descriptors', function(){
       , spyC = sinon.spy()
       , spyD = sinon.spy();
 
-    result = cobble.compose(
+    result = cobble(
         { prop: spyA }
       , { prop: spyB }
       , { prop: cobble.before(spyC) }
@@ -37,7 +37,7 @@ describe(' when using descriptors', function(){
       , spyC = sinon.spy()
       , spyD = sinon.spy();
 
-    result = cobble.composeInto(
+    result = cobble.into(
         Object.create({ prop: spyA })
       , { prop: spyB }
       , { prop: cobble.before(spyC) }
@@ -58,7 +58,7 @@ describe(' when using descriptors', function(){
       , spyC = sinon.spy()
       , spyD = sinon.spy();
 
-    result = cobble.compose(
+    result = cobble(
         { prop: spyA }
       , { prop: spyB }
       , { prop: spyC }
@@ -75,7 +75,7 @@ describe(' when using descriptors', function(){
     var result, i
       , spyA = sinon.spy(), spyB = sinon.spy(), spyC = sinon.spy();
 
-    result = cobble.compose(
+    result = cobble(
         { a: spyA }
       , { a: spyB }
       , { a: cobble.before(spyC) })
@@ -93,7 +93,7 @@ describe(' when using descriptors', function(){
       , spyB = sinon.spy(function( last ){ return last + " B" })
       , spyC = sinon.spy(function( last ){ return last + " C" });
 
-    result = cobble.compose(
+    result = cobble(
         { a: spyA }
       , { a: spyB }
       , { a: cobble.composeBefore(spyC) })
@@ -109,7 +109,7 @@ describe(' when using descriptors', function(){
     var result, i
       , spyA = sinon.spy(), spyB = sinon.spy(), spyC = sinon.spy();
 
-    result = cobble.compose(
+    result = cobble(
         { a: spyA }
       , { a: spyB }
       , { a: cobble.after(spyC) })
@@ -126,10 +126,10 @@ describe(' when using descriptors', function(){
       , spyB = sinon.spy(function( last ){ return last + " B" })
       , spyC = sinon.spy(function( last ){ return last + " C" });
 
-    result = cobble.compose(
+    result = cobble(
         { a: spyA }
       , { a: spyB }
-      , { a: cobble.composeAfter(spyC) })
+      , { a: cobble.compose(spyC) })
 
       result.a('start').should.equal('start A B C')
 
@@ -141,7 +141,7 @@ describe(' when using descriptors', function(){
   it( 'should call the new method around the old', function(){
     var result, spyA = sinon.spy(), spyB = sinon.spy(), spyC;
 
-    result = cobble.compose(
+    result = cobble(
         { a: spyA }
       , { a: spyB }
       , { a: cobble.around(spyC = sinon.spy(function(wrapped){
@@ -161,7 +161,7 @@ describe(' when using descriptors', function(){
     var spanish = { greet: function(){ return "hola" } }
       , german  = { greet: function(){ return "guten morgen" } }
 
-      , result = cobble.compose(spanish, german, {
+      , result = cobble(spanish, german, {
 
           greet: cobble.reduce(function(target, next) {
             return function(){
@@ -178,7 +178,7 @@ describe(' when using descriptors', function(){
 
   it( 'should concat array', function(){
     var mixinA = { a: [1,2,3] }
-      , result = cobble.compose(
+      , result = cobble(
           mixinA,
           {
             a: cobble.concat([4,5])
@@ -192,19 +192,19 @@ describe(' when using descriptors', function(){
     var obj = { a: true, c: false, d: 'hi' }
       , result;
 
-    result = cobble.compose(
+    result = cobble(
         obj
       , {  b: cobble.from(obj, 'a') })
 
     result.b.should.equal(true)
 
-    result = cobble.compose(
+    result = cobble(
         obj
       , {  b: cobble.from('c') })
 
     result.b.should.equal(false)
 
-    result = cobble.compose(
+    result = cobble(
         obj
       , {  d: cobble.from(obj) })
 

@@ -2,62 +2,45 @@ var _ = require('lodash')
   , invariant = require('./lib/invariant')
   , descriptors = require('./lib/descriptors')
 
+module.exports = _.extend(cobble, descriptors)
+
 /**
  * compose objects into a new object, leaving the original objects untouched
  * @param {...object} an object to be composed.
  * @return {object}
  */     
-function compose(){
-  var args = _.flatten(arguments, true)
-    , result = {}
-    , propHash = {};
-
-  for(var i = 0; i < args.length; i++)
-    mergeInto(result, args[i], propHash)
-
-  checkRequired(result)
-
-  return result
+function cobble(){
+  return cobble.into({}, _.flatten(arguments, true))
 }
 
 /**
  * compose arguments into the first arg, mutating it
- * @param  {objects target
+ * @param  {object} target object; is mutated.
  * @param  {...objects} object to merge into the target object
  * @return {object}
  */
-function composeInto(first){
+cobble.into = function into(_first){
   var args = _.rest(_.flatten(arguments, true))
+    , target = _first
     , propHash = {};
 
   for(var i = 0; i < args.length; i++)
-    mergeInto(first, args[i], propHash)
+    _.each(args[i], function(value, key) {
+      var inTarget = key in target
+        , isRequired = value === descriptors.required;
 
-  checkRequired(first)
+      if ( !isRequired && inTarget && ( !propHash[key] || !_.contains(propHash[key], target[key]) )) 
+          add(propHash, key, target[key])
 
-  return first
+      define(value, key, target, propHash)
+    })
+
+  checkRequired(target)
+
+  return target
 }
 
-/**
- * composes two objects mutating the first
- * @param  {object} src
- * @param  {object} target
- * @return {object}
- */
-function mergeInto(src, target, propHash){
-  
 
-  //console.log(src.traits)
-  _.each(target, function(value, key){
-    var inSrc = key in src
-      , isRequired = value === descriptors.required;
-
-    if ( !isRequired && inSrc && ( !propHash[key] || !_.contains(propHash[key], src[key]) )) 
-        add(propHash, key, src[key])
-
-    define(value, key, src, propHash)
-  })
-}
 
 /**
  * adds a property to the src object or expands the value if it is a decorator
@@ -104,11 +87,4 @@ function add(obj, key, value) {
   obj[key].push(value)
 }
 
-module.exports = _.extend({
 
-  compose: compose,
-  composeInto: composeInto,
-
-  mergeInto: mergeInto
-
-}, descriptors)

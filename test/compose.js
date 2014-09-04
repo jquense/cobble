@@ -12,13 +12,13 @@ describe(' when composing objects together', function(){
   it( 'should handle arrays', function(){
     var result;
 
-    result = cobble.compose({ a: false, b: 5 }, [{ a: true }, { a: 'hi' }])
+    result = cobble({ a: false, b: 5 }, [{ a: true }, { a: 'hi' }])
 
     result.a.should.equal('hi')
     Object.keys(result).length.should.equal(2)
 
     
-    result = cobble.compose([{ a: false, b: 5 }, { a: [1] }])
+    result = cobble([{ a: false, b: 5 }, { a: [1] }])
 
     result.a[0].should.equal(1)
     Object.keys(result).length.should.equal(2)
@@ -28,7 +28,7 @@ describe(' when composing objects together', function(){
   it( 'should have all properties', function(){
     var result;
 
-    result = cobble.compose({ a: false, b: 5 }, { a: true })
+    result = cobble({ a: false, b: 5 }, { a: true })
 
     Object.keys(result).length.should.equal(2)
   })
@@ -38,7 +38,7 @@ describe(' when composing objects together', function(){
       , two = { a: true }
       , result;
 
-    result = cobble.compose(one, two)
+    result = cobble(one, two)
 
     one.should.deep.equal({ a: false })
     two.should.deep.equal({ a: true })
@@ -48,7 +48,7 @@ describe(' when composing objects together', function(){
   it( 'should override earlier properties my default', function(){
     var result;
 
-    result = cobble.compose({ a: false, }, { a: true })
+    result = cobble({ a: false, }, { a: true })
     result.a.should.equal(true)
   })
 
@@ -69,7 +69,7 @@ describe(' when composing objects together', function(){
     it( 'should execute the descriptor', function(){
       var result;
 
-      result = cobble.compose({
+      result = cobble({
           a: function(){ throw new Error }
         }, 
         {
@@ -88,7 +88,7 @@ describe(' when composing objects together', function(){
 
       st = sinon.stub(console, 'warn', function(){})
 
-      result = cobble.compose(
+      result = cobble(
         { a: cobble.required }, 
         { b: true })
 

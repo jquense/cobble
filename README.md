@@ -1,39 +1,51 @@
 Cobble
 ========
 
-tiny composition lib for doing easy object mixins. 
+tiny composition lib for doing easy object mixins. The point of Cobble is to add minimal sugar to doing normal Object and Function composition. Cobble works out to being fairly useful as the underpinnings for mixin systems for other object models, as it provides a robust and straitforward way to handle multiple conflicts when merging objects together.
+
+## Breaking Changes upgrading from  v0.15.0
+
+- reworked the public api
+- `cobble.compose()` and `cobble.composeInto()` are now `cobble()` and `cobble.into()` respectively
+- there is a NEW `compose` method that is a descriptor for composing methods
 
 ## API
 
-### compose([...objects])
-compose a bunch of object literals into a single new object. `compose()` does not mutate any of the arguments
+require the module; 
 
-    var mixinA = { a: true }
-      , mixinB = { b: true }
-      , result = cobble.compose(mixinA, mixinB);
+  var cobble = require('cobble')
 
+### cobble(...objects)
+compose a bunch of object literals into a single new object. `cobble()` does not mutate any of the arguments
 
-### composeInto([target, ...objects])
-compose a bunch of object literals into a single new object. `composeInto()` mutates the first argument, useful for compising into an existing object, or a prototype.
+    var first = { isCool: true }
+      , second = { isAwesome: true }
+      , result = cobble(first, second);
 
-    var mixinA = { a: true }
-      , mixinB = { b: true };
+    result.isCool && result.isAwesome // => true
 
-    cobble.composeInto(mixinA, mixinB)
-    console.log(mixinA.b) //=> true
+### cobble.into(target, ...objects)
+compose a bunch of object literals into a single new object. `.into()` mutates the first argument, useful for composing into an existing object, or a prototype.
+
+    var first = { isCool: true }
+      , second = { isAwesome: true };
+
+    cobble.into(first, second)
+    first.hasOwnProperty('isAwesome') //=> true
 
 ### Descriptors
 Descriptors are function helpers for telling cobble how to handle conflicts between properties. By default, conflicting properties will be overridden by a later property in the chain
     
     var mixinA = { greet: function(){ console.log('first one!') } }
       , mixinB = { greet: function(){ console.log('second one!') } }
-      , result = cobble.compose(mixinA, mixinB);
+      , result = cobble(mixinA, mixinB);
+
     result.greet() //=> 'second one!'
 
 we can adjust the behaviour by using a descriptor to hint at how cobble should compose the property. here we use the `before` descriptor to decorate the property.
 
     var mixinA  = { greet: function(){ console.log('first one!') } }
-      , result = cobble.compose(
+      , result = cobble(
           mixinA, 
           {
             greet: cobble.before(function(){ 
@@ -52,11 +64,11 @@ consider the following composition:
       , mixinB = { greet: function(){ console.log('hola') } }
       , mixinC = { greet: function(){ console.log('greetings!') } };
 
-    cobble.compose(mixinA, mixinB, mixinC)
+    cobble(mixinA, mixinB, mixinC)
 
 each mixin specifies a `greet` method that would conflict with the others if we compose them. Since cobble internally tracks each conflict we can use a single descriptor to compose each `greet` method
 
-    var chained = cobble.compose(
+    var chained = cobble(
         mixinA, 
         mixinB, 
         mixinC, 
@@ -68,7 +80,7 @@ each mixin specifies a `greet` method that would conflict with the others if we 
 
 Descriptors are passed in all previous values of a particular property at the time it is composed in the chain (in this case mixinA, B and C). Once a descriptor 'resolves' a set of values, they are considered resolved and any descriptors for the same key further down the chain will be passed in the composed value, and not the original values. for example if we changed the example to: 
 
-    var chained = cobble.compose(
+    var chained = cobble(
         mixinA, 
         mixinB, 
         {
@@ -83,14 +95,14 @@ Descriptors are passed in all previous values of a particular property at the ti
 
 is the same as:
 
-    var chained = cobble.compose(
+    var chained = cobbleompose(
         mixinA, 
         mixinB, 
         {
             greet: cobble.chain()
         })
 
-    var befored = cobble.compose(
+    var befored = cobble(
         chained,    
         mixinC,
         {
@@ -99,12 +111,28 @@ is the same as:
             })
         });
 
+Most descriptors can be called without any arguments and will be applied to any existing conflicts up the chain.
 
-#### Cobble comes with a few descriptors already:
+#### Included Descriptors:
 
-`before(method)` - wraps the provided method before the previous method(s) of the same property  
+`cobble.compose(method)` - composes the provided method into the chain of values, where each function consumes the return value of the previous
 
-`after(method)` - wraps the provided method before the previous method(s) of the same property
+    var result = cobble(
+        { 
+          greeting: function(){ return 'hello' }
+        },
+        { greeting: cobble.compose(function(greeting){ 
+            return greeting + ' and good day'
+          })
+      });
+
+      result.greeting() //=> 'hello and good day' 
+
+`cobble.composeBefore(method)` - exactly like `.compose` extecept the provided foction is as the first function in the composition chain.
+
+`cobble.before(method)` - wraps the provided method before the previous method(s) of the same property  
+
+`cobble.after(method)` - wraps the provided method before the previous method(s) of the same property
 
     var mixinA  = { greet: function(){ console.log('hi') } }
       , result = cobble.compose(
@@ -117,7 +145,7 @@ is the same as:
 
       result.greet() //=> 'hi' 'john' 
 
-`around(method)` - wraps the provided method around the previous method of the same property, passing in the previous method as the first argument 
+`cobble.around(method)` - wraps the provided method around the previous method of the same property, passing in the previous method as the first argument 
     
     {
         key: cobble.around(function(prevMethod, argA, argB){
@@ -127,6 +155,42 @@ is the same as:
         })
     }     
 
-`concat(array)` - concats an array property with the previous one
+`cobble.concat(array)` - concats an array property with the previous one
  
-`from([object, [oldKey]])`: shallow borrow a property from another object, or key.
+`cobble.from([object, [oldKey]])` - shallow borrow a property from another object, or key. If you provide BOTH an `object` and a `key` the descriptor will evaluate the property immediately and just set the key to the property. 
+
+    var obj = { a: true, c: false, d: 'hi' }
+      , result;
+
+    result = cobble(obj, {  b: cobble.from(obj, 'a') }) //b is set to a as soon as from executes
+
+    result.b // => true
+
+    result = cobble(obj, {  b: cobble.from('c') }) //b is set to c during composition
+
+    result.b // => false
+
+    result = cobble(obj, {  d: cobble.from(obj) })
+
+    result.d // => 'hi'
+
+`cobble.chain()` - composes all functions in the chain into a single function that is called in order. Return values are ignored.
+
+`cobble.merge()` - composes all functions in the chain into a single function that is called in order. Merge makes an attempt to merge the return values of each function into a single return value, merge assumes that return values will be objects and uses `Object.assign` to create a new unified return value
+
+`cobble.Descriptor(fn)` - Base Descriptor object, which you can create custom descriptors with. Descriptors are created by providing a function that is called at the time of composition, The value returned from the function will be the value set to the provided `key`. The `previousValues` parameter is an array of any and all possible values for that key up to the point when the descriptor is called.
+
+    var reduce = new cobble.Descriptor(function(key, previousValues){
+        return previousValues.reduce(function(result, next){
+            return result + next
+          }, 0)
+      })
+
+    var obj = cobble(
+      { num: 1 },
+      { num: 2 },
+      { num: reduce } // at this point previous values will be [1, 2]
+      { num: 3 }
+      { num: reduce }) // now previous values will be [3, 3]
+
+    obj.num // => 6

@@ -119,6 +119,16 @@ Most descriptors can be called without any arguments and will be applied to any 
 
 #### Included Descriptors:
 
+`cobble.required()` - simple Descriptor that identifies a key as required. When properties are missing after a `cobble()` it will warning of missing properties. For production setting either `__DEV__` global variable to true or `process.env.NODE_DEBUG === 'production'`
+
+    var result = cobble(
+        { 
+          greeting: cobble.required()
+        },
+        { anotherProp: 'hi' });
+
+     // Invariant Warning!
+
 `cobble.compose(method)` - composes the provided method into the chain of values, where each function consumes the return value of the previous
 
     var result = cobble(

@@ -1,7 +1,7 @@
 {
   "name": "cobble",
-  "version": "0.15.0",
-  "description": "tiny composition utils useful as a mixin system",
+  "version": "0.16.0",
+  "description": "tiny object composition utils useful as a mixin system, or shoes",
   "main": "index.js",
   "scripts": {
     "test": "mocha -R spec ./test/*.js"
@@ -14,6 +14,8 @@
     "composition",
     "aspect",
     "trait",
+    "mixin",
+    "Manchester-Orchestra"
     "descriptor"
   ],
   "author": "Jason Quense @theporchrat",

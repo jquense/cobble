@@ -30,28 +30,7 @@ describe(' when using descriptors', function(){
     spyD.should.have.been.calledAfter(spyC).and.calledOnce
   })
 
-  it( 'should ignore proto props', function(){
-    var result
-      , spyA = sinon.spy()
-      , spyB = sinon.spy()
-      , spyC = sinon.spy()
-      , spyD = sinon.spy();
-
-    result = cobble.into(
-        Object.create({ prop: spyA })
-      , { prop: spyB }
-      , { prop: cobble.before(spyC) }
-      , { prop: cobble.after(spyD) })
-
-    result.prop()
-
-    spyA.should.not.have.been.called
-    spyB.should.have.been.calledOnce
-    spyC.should.have.been.calledBefore(spyB).and.calledOnce
-    spyD.should.have.been.calledAfter(spyC).and.calledOnce
-  })
-
-  // it( 'should resolve proto props once', function(){
+  //it( 'should ignore proto props', function(){
   //   var result
   //     , spyA = sinon.spy()
   //     , spyB = sinon.spy()
@@ -66,11 +45,32 @@ describe(' when using descriptors', function(){
 
   //   result.prop()
 
-  //   spyA.should.have.been.calledOnce
+  //   spyA.should.not.have.been.called
   //   spyB.should.have.been.calledOnce
-  //   spyC.should.have.been.calledBefore(spyA).and.calledOnce
+  //   spyC.should.have.been.calledBefore(spyB).and.calledOnce
   //   spyD.should.have.been.calledAfter(spyC).and.calledOnce
   // })
+
+  it( 'should resolve proto props once', function(){
+    var result
+      , spyA = sinon.spy()
+      , spyB = sinon.spy()
+      , spyC = sinon.spy()
+      , spyD = sinon.spy();
+
+    result = cobble.into(
+        Object.create({ prop: spyA })
+      , { prop: spyB }
+      , { prop: cobble.before(spyC) }
+      , { prop: cobble.after(spyD) })
+
+    result.prop()
+
+    spyA.should.have.been.calledOnce
+    spyB.should.have.been.calledOnce
+    spyC.should.have.been.calledBefore(spyA).and.calledOnce
+    spyD.should.have.been.calledAfter(spyC).and.calledOnce
+  })
 
   it( 'should work without a specified method', function(){
     var result

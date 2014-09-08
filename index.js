@@ -26,7 +26,7 @@ cobble.into = function into(_first){
 
   for(var i = 0; i < args.length; i++)
     _.each(args[i], function(value, key) {
-      var inTarget = key in target
+      var inTarget = _.has(target, key) //key in target
         , isRequired = value === descriptors.required;
 
       if ( !isRequired && inTarget && ( !propHash[key] || !_.contains(propHash[key], target[key]) )) 

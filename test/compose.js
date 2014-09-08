@@ -97,5 +97,25 @@ describe(' when composing objects together', function(){
 
       console.warn.restore()
     })
+
+    it( 'should override required', function(){
+      var result;
+
+      result = cobble(
+        { a: cobble.required }, 
+        { a: true })
+
+      result.a.should.equal(true)
+    })
+
+    it( 'should not override a value with "required"', function(){
+      var result;
+
+      result = cobble(
+        { a: true },
+        { a: cobble.required })
+
+      result.a.should.equal(true)
+    })
   })
 })

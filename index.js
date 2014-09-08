@@ -54,16 +54,17 @@ function define(value, key, src, propHash){
     , isDescriptor = value instanceof descriptors.Descriptor
     , prev;
 
-  if ( !isRequired ) 
+  if (isRequired && inSrc) 
+    return
 
+  if ( !isRequired ) {
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
       return define(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
       add(propHash, key, value)
-    
-      
+  }
 
   Object.defineProperty(src, key, {
     enumerable: true, 

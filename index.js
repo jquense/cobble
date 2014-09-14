@@ -83,7 +83,7 @@ function checkRequired(obj){
 }
 
 function add(obj, key, value) {
-  obj[key] = (obj[key] || [])
+  obj[key] = _.has(obj, key) ? obj[key] : []
   obj[key].push(value)
 }
 

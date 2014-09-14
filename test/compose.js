@@ -52,6 +52,15 @@ describe(' when composing objects together', function(){
     result.a.should.equal(true)
   })
 
+  it( 'should work on inherited object props', function(){
+    var spy, result;
+
+    result = cobble({ constructor: spy = sinon.spy(function(){}) })
+
+    result.constructor()
+    spy.should.have.been.calledOnce
+  })
+
   describe( 'when using descriptors', function(){
 
     it( 'should construct descriptors', function(){

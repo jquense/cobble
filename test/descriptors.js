@@ -30,6 +30,27 @@ describe(' when using descriptors', function(){
     spyD.should.have.been.calledAfter(spyC).and.calledOnce
   })
 
+  //it( 'should ignore proto props', function(){
+  //   var result
+  //     , spyA = sinon.spy()
+  //     , spyB = sinon.spy()
+  //     , spyC = sinon.spy()
+  //     , spyD = sinon.spy();
+
+  //   result = cobble.into(
+  //       Object.create({ prop: spyA })
+  //     , { prop: spyB }
+  //     , { prop: cobble.before(spyC) }
+  //     , { prop: cobble.after(spyD) })
+
+  //   result.prop()
+
+  //   spyA.should.not.have.been.called
+  //   spyB.should.have.been.calledOnce
+  //   spyC.should.have.been.calledBefore(spyB).and.calledOnce
+  //   spyD.should.have.been.calledAfter(spyC).and.calledOnce
+  // })
+
   it( 'should resolve proto props once', function(){
     var result
       , spyA = sinon.spy()

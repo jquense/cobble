@@ -26,7 +26,7 @@ cobble.into = function into(_first){
 
   for(var i = 0; i < args.length; i++)
     _.each(args[i], function(value, key) {
-      var inTarget = key in target
+      var inTarget   = key in target
         , isRequired = value === descriptors.required;
 
       if ( !isRequired && inTarget && ( !propHash[key] || !_.contains(propHash[key], target[key]) )) 
@@ -54,16 +54,17 @@ function define(value, key, src, propHash){
     , isDescriptor = value instanceof descriptors.Descriptor
     , prev;
 
-  if ( !isRequired ) 
+  if (isRequired && inSrc) 
+    return
 
+  if ( !isRequired ) {
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
       return define(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
       add(propHash, key, value)
-    
-      
+  }
 
   Object.defineProperty(src, key, {
     enumerable: true, 

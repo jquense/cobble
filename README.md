@@ -1,7 +1,9 @@
 Cobble
 ========
 
-tiny composition lib for doing easy object mixins. The point of Cobble is to add minimal sugar to doing normal Object and Function composition. Cobble works out to being fairly useful as the underpinnings for mixin systems for other object models, as it provides a robust and straitforward way to handle multiple conflicts when merging objects together.
+tiny composition lib for doing easy object mixins. The point of Cobble is to add minimal sugar to doing normal Object and Function composition. It is something like Traits, except that conflicts are overridden by default. Cobble works out to being fairly useful as the underpinnings for mixin systems for other object models, as it provides a robust and straightforward way to handle multiple conflicts when merging objects together.
+
+If you are looking for a more complete object model wrapper try: [Clank](https://github.com/theporchrat/clank) which uses cobble internally.
 
 ## Breaking Changes upgrading from  v0.15.0
 
@@ -116,6 +118,10 @@ is the same as:
         });
 
 Most descriptors can be called without any arguments and will be applied to any existing conflicts up the chain.
+
+__NOTE: `cobble` checks down the entire prototype chain not just "own" properties, this allows you to do super calls easily when composing objects with "inherited" properties, but can lead to unintended behaviour if you are not aware__
+
+
 
 #### Included Descriptors:
 

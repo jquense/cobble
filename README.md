@@ -171,12 +171,12 @@ Most descriptors can be called without any arguments and will be applied to any 
 
 `cobble.concat(array)` - concats an array property with the previous one
  
-`cobble.from([object, [oldKey]])` - shallow borrow a property from another object, or key. If you provide BOTH an `object` and a `key` the descriptor will evaluate the property immediately and just set the key to the property. 
+`cobble.from([object, [oldKey]])` - shallow borrow a property from another object, or key. If you provide BOTH an `object` and a `key` then the property `key` of `obj` is returned instead of a Descriptor.
 
     var obj = { a: true, c: false, d: 'hi' }
       , result;
 
-    result = cobble(obj, {  b: cobble.from(obj, 'a') }) //b is set to a as soon as `from` executes
+    result = cobble(obj, {  b: cobble.from(obj, 'a') }) //this is equivalent to doing `{ b: obj.a }`
 
     result.b // => true
 

@@ -93,13 +93,13 @@ Descriptors are passed in all previous values of a particular property at the ti
         mixinC,
         {
             greet: cobble.before(function(){
-                console.log('e\'llo')    
+                console.log("e'llo")    
             })
         })
 
 is the same as:
 
-    var chained = cobbleompose(
+    var chained = cobble(
         mixinA, 
         mixinB, 
         {
@@ -111,7 +111,7 @@ is the same as:
         mixinC,
         {
             greet: cobble.before(function(){
-                console.log('e\'llo')    
+                console.log("e'llo")    
             })
         });
 
@@ -142,11 +142,11 @@ Most descriptors can be called without any arguments and will be applied to any 
 
       result.greeting() //=> 'hello and good day' 
 
-`cobble.composeBefore(method)` - exactly like `.compose` extecept the provided foction is as the first function in the composition chain.
+`cobble.composeBefore(method)` - exactly like `.compose` except the provided function is as the first function in the composition chain.
 
-`cobble.before(method)` - wraps the provided method before the previous method(s) of the same property  
+`cobble.before(method)` - wraps the provided method before the previous method(s) of the same property. The arguments passed to each method in the chain are the same, meaning it _ignores_ return values
 
-`cobble.after(method)` - wraps the provided method before the previous method(s) of the same property
+`cobble.after(method)` - wraps the provided method before the previous method(s) of the same property. The arguments passed to each method in the chain are the same, meaning it _ignores_ return values
 
     var mixinA  = { greet: function(){ console.log('hi') } }
       , result = cobble.compose(
@@ -176,7 +176,7 @@ Most descriptors can be called without any arguments and will be applied to any 
     var obj = { a: true, c: false, d: 'hi' }
       , result;
 
-    result = cobble(obj, {  b: cobble.from(obj, 'a') }) //b is set to a as soon as from executes
+    result = cobble(obj, {  b: cobble.from(obj, 'a') }) //b is set to a as soon as `from` executes
 
     result.b // => true
 
@@ -188,9 +188,9 @@ Most descriptors can be called without any arguments and will be applied to any 
 
     result.d // => 'hi'
 
-`cobble.chain()` - composes all functions in the chain into a single function that is called in order. Return values are ignored.
+`cobble.chain()` - composes all functions in the chain into a single function that is called in order. Return values are ignored. This is an alias for `before`.
 
-`cobble.merge()` - composes all functions in the chain into a single function that is called in order. Merge makes an attempt to merge the return values of each function into a single return value, merge assumes that return values will be objects and uses `Object.assign` to create a new unified return value
+`cobble.merge()` - composes all functions in the chain into a single function that is called in order. Merge makes an attempt to merge the return values of each function into a single return value, merge assumes that return values will be objects and uses `Object.assign` to create a new unified return value.
 
 `cobble.Descriptor(fn)` - Base Descriptor object, which you can create custom descriptors with. Descriptors are created by providing a function that is called at the time of composition, The value returned from the function will be the value set to the provided `key`. The `previousValues` parameter is an array of any and all possible values for that key up to the point when the descriptor is called.
 
@@ -204,7 +204,7 @@ Most descriptors can be called without any arguments and will be applied to any 
       { num: 1 },
       { num: 2 },
       { num: reduce } // at this point previous values will be [1, 2]
-      { num: 3 }
-      { num: reduce }) // now previous values will be [3, 3]
+      { num: 4 }
+      { num: reduce }) // now previous values will be [3, 4]
 
-    obj.num // => 6
+    obj.num // => 7

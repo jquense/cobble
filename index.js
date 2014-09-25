@@ -35,12 +35,20 @@ cobble.into = function into(_first){
       define(value, key, target, propHash)
     })
 
-  checkRequired(target)
+  //checkRequired(target)
 
   return target
 }
 
+cobble.assert = function checkRequired(obj){
+  var required = _.keys(_.pick(obj, function(v){ 
+        return v === descriptors.required 
+      }))
 
+  if( required.length !== 0 )
+    throw new TypeError("Unmet required properties: " + required.join(', '))
+  return true
+}
 
 /**
  * adds a property to the src object or expands the value if it is a decorator

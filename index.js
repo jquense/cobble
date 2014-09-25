@@ -51,14 +51,15 @@ cobble.into = function into(_first){
 function define(value, key, src, propHash){
   var inSrc = key in src
     , isRequired = value === descriptors.required
-    , isDescriptor = value instanceof descriptors.Descriptor
+    , isPropDescriptor = value === descriptors.property
+    , isResolutionDescriptor = (value instanceof descriptors.Descriptor) && !isRequired && !isPropDescriptor
     , prev;
 
   if (isRequired && inSrc) 
     return
 
   if ( !isRequired ) {
-    if ( isDescriptor) {
+    if ( isResolutionDescriptor ) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
       return define(value.resolve.call(src, key, prev), key, src, propHash)
     }
@@ -66,12 +67,7 @@ function define(value, key, src, propHash){
       add(propHash, key, value)
   }
 
-  Object.defineProperty(src, key, {
-    enumerable: true, 
-    writable: true, 
-    configurable: true,
-    value: value
-  })
+  Object.defineProperty(src, key, isPropDescriptor ? value.resolve() : value)
 }
 
 function checkRequired(obj){
@@ -88,4 +84,17 @@ function add(obj, key, value) {
   obj[key].push(value)
 }
 
+function toPropertyDescriptor(value){
+  var isDesc = _.isPlainObject(value) && _.has(value, 'value') || _.has(value, 'set') || _.has(value, 'get') 
+               || _.has(value, 'writable') || _.has(value, 'enumerable');
 
+  if( !isDesc  )
+    value = { value: value }
+
+  return _.extend({}, value, {
+    enumerable: true, 
+    writable: true, 
+    configurable: true,
+    value: value
+  })
+}

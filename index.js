@@ -40,7 +40,7 @@ cobble.into = function into(_first){
   return target
 }
 
-
+cobble.assert = checkRequired
 
 /**
  * adds a property to the src object or expands the value if it is a decorator

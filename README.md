@@ -5,20 +5,19 @@ tiny composition lib for doing easy object mixins. The point of Cobble is to add
 
 If you are looking for a more complete object model wrapper try: [Clank](https://github.com/theporchrat/clank) which uses cobble internally.
 
-## Breaking Changes upgrading from  v0.15.0
+## Changes in v1.1.0
 
-- reworked the public api
-- `cobble.compose()` and `cobble.composeInto()` are now `cobble()` and `cobble.into()` respectively
-- there is a NEW `compose` method that is a descriptor for composing methods
+- the `cobble` and `cobble.into` functions no longer warn about missing properties. use the newly added `cobble.assert`, or `cobble.isRequired` methods to do finalizing checks
+- Internal calls to `instanceof Descriptor` have been replaces with a duck typing check (see `isDescriptor`) in order to allow interop between different included cobble packages.
 
 ## API
 
-require the module; 
+Require the module; 
 
   var cobble = require('cobble')
 
 ### cobble(...objects)
-compose a bunch of object literals into a single new object. `cobble()` does not mutate any of the arguments. 
+Compose a bunch of object literals into a single new object. `cobble()` does not mutate any of the arguments. 
 
     var first = { isCool: true }
       , second = { isAwesome: true }
@@ -29,7 +28,7 @@ compose a bunch of object literals into a single new object. `cobble()` does not
 **note:** you can pass in arrays of objects as well and cobble will flatten them appropriately: `cobble([ first, second], third, [fourth, fifth])` saves needing to use `apply()` in most cases
 
 ### cobble.into(target, ...objects)
-compose a bunch of object literals into a single new object. `.into()` mutates the first argument, useful for composing into an existing object, or a prototype.
+Compose a bunch of object literals into a single new object. `.into()` mutates the first argument, useful for composing into an existing object, or a prototype.
 
     var first = { isCool: true }
       , second = { isAwesome: true };
@@ -38,6 +37,10 @@ compose a bunch of object literals into a single new object. `.into()` mutates t
     first.hasOwnProperty('isAwesome') //=> true
 
 **note:** you can pass in arrays of objects as well and cobble will flatten them appropriately: `cobble.into([ first, second], third, [fourth, fifth])` saves needing to use `apply()` in most cases
+
+### cobble.assert(object)
+
+Checks the passed in `object` for the existence of unmet required properties on the object. You can use this a check when an object is finalized. On failure it throws a `TypeError` with the property `required` which is an array of the missing properties.
 
 ### Descriptors
 Descriptors are function helpers for telling cobble how to handle conflicts between properties. By default, conflicting properties will be overridden by a later property in the chain
@@ -125,15 +128,17 @@ __NOTE: `cobble` checks down the entire prototype chain not just "own" propertie
 
 #### Included Descriptors:
 
-`cobble.required()` - simple Descriptor that identifies a key as required. When properties are missing after a `cobble()` it will warning of missing properties. For production setting either `__DEV__` global variable to true or `process.env.NODE_DEBUG === 'production'`
+`cobble.required` - A special Descriptor that identifies a property as required. By default required properties do not warn, so you can use `cobble.assert(obj)` to check for the existence unmet requirements.
 
-    var result = cobble(
-        { 
-          greeting: cobble.required()
-        },
-        { anotherProp: 'hi' });
+    var result = cobble({ greeting: cobble.required });
 
-     // Invariant Warning!
+    cobble.assert(result) // TypeError: Unmet requirements: 'greetings'
+
+    result = cobble(result, { greeting: 'hello'})
+
+    cobble.assert(result) // no error
+
+
 
 `cobble.compose(method)` - composes the provided method into the chain of values, where each function consumes the return value of the previous
 
@@ -214,3 +219,8 @@ __NOTE: `cobble` checks down the entire prototype chain not just "own" propertie
       { num: reduce }) // now previous values will be [3, 4]
 
     obj.num // => 7
+
+
+`cobble.isDescriptor(value)` - duck type check for descriptors, use this instead of `value instanceof cobble.Descriptor`, which will fail for descriptors passed in from other cobble instances.
+
+`cobble.isRequired(value)` - returns `true` if the value is a required property descriptor, use this instead of a `val instanceof cobble.required`, which will fail for descriptors passed in from other cobble instances.

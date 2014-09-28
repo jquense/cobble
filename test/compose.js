@@ -99,6 +99,12 @@ describe(' when composing objects together', function(){
 
       ;(function(){ 
         cobble.assert(result) }).should.throw(TypeError)
+
+      try { cobble.assert(result) }
+      catch (err) {
+        err.should.be.an.instanceOf(TypeError)
+          .and.have.property('required').that.eqls(['a'])
+      }
     })
 
     it( 'should override required', function(){
@@ -110,7 +116,7 @@ describe(' when composing objects together', function(){
 
       result.a.should.equal(true)
 
-      cobble.assert(result).should.equal(true)
+      ;(function(){cobble.assert(result)}).should.not.throw(TypeError)
     })
 
     it( 'should not override a value with "required"', function(){

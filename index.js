@@ -40,7 +40,15 @@ cobble.into = function into(_first){
   return target
 }
 
-
+cobble.assert = function (obj){    
+  var required = _.keys(_.pick(obj, descriptors.isRequired))    
+   
+  if( required.length !== 0 ){
+    var err = new TypeError("Unmet required properties: " + required.join(', '))
+    err.required = required
+    throw err
+  }    
+}
 /**
  * adds a property to the src object or expands the value if it is a decorator
  * @param  {*} value

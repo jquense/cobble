@@ -91,20 +91,20 @@ describe(' when composing objects together', function(){
     })
 
     it( 'should warn about missing required properties', function(){
-      var result, st;
-
-      if ( console.warn.restore ) console.warn.restore()
-
-      st = sinon.stub(console, 'warn', function(){})
+      var result;
 
       result = cobble(
         { a: cobble.required }, 
         { b: true })
 
-      result.a.should.equal(cobble.required)
-      st.should.have.been.calledOnce
+      ;(function(){ 
+        cobble.assert(result) }).should.throw(TypeError)
 
-      console.warn.restore()
+      try { cobble.assert(result) }
+      catch (err) {
+        err.should.be.an.instanceOf(TypeError)
+          .and.have.property('required').that.eqls(['a'])
+      }
     })
 
     it( 'should override required', function(){
@@ -115,6 +115,8 @@ describe(' when composing objects together', function(){
         { a: true })
 
       result.a.should.equal(true)
+
+      ;(function(){cobble.assert(result)}).should.not.throw(TypeError)
     })
 
     it( 'should not override a value with "required"', function(){

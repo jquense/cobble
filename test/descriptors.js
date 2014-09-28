@@ -30,26 +30,6 @@ describe(' when using descriptors', function(){
     spyD.should.have.been.calledAfter(spyC).and.calledOnce
   })
 
-  //it( 'should ignore proto props', function(){
-  //   var result
-  //     , spyA = sinon.spy()
-  //     , spyB = sinon.spy()
-  //     , spyC = sinon.spy()
-  //     , spyD = sinon.spy();
-
-  //   result = cobble.into(
-  //       Object.create({ prop: spyA })
-  //     , { prop: spyB }
-  //     , { prop: cobble.before(spyC) }
-  //     , { prop: cobble.after(spyD) })
-
-  //   result.prop()
-
-  //   spyA.should.not.have.been.called
-  //   spyB.should.have.been.calledOnce
-  //   spyC.should.have.been.calledBefore(spyB).and.calledOnce
-  //   spyD.should.have.been.calledAfter(spyC).and.calledOnce
-  // })
 
   it( 'should resolve proto props once', function(){
     var result
@@ -232,4 +212,17 @@ describe(' when using descriptors', function(){
     result.d.should.equal('hi')
   })
 
+
+  it('should recognize descriptors', function(){
+    cobble.isDescriptor(new cobble.Descriptor).should.equal(true)
+    cobble.isDescriptor({ isCobbleDescriptor: true }).should.equal(true)
+
+    cobble.isDescriptor(cobble.required).should.equal(true)
+    cobble.isDescriptor({ isCobbleDescriptor: true, isRequired: true }).should.equal(true)
+  })
+
+  it('should recognize required', function(){
+    cobble.isRequired(cobble.required).should.equal(true)
+    cobble.isRequired({ isCobbleDescriptor: true, isRequired: true }).should.equal(true)
+  })
 })

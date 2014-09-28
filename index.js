@@ -27,7 +27,7 @@ cobble.into = function into(_first){
   for(var i = 0; i < args.length; i++)
     _.each(args[i], function(value, key) {
       var inTarget   = key in target
-        , isRequired = value === descriptors.required;
+        , isRequired = descriptors.isRequired(value);
 
       if ( !isRequired && inTarget && ( !propHash[key] || !_.contains(propHash[key], target[key]) )) 
           add(propHash, key, target[key])
@@ -35,12 +35,11 @@ cobble.into = function into(_first){
       define(value, key, target, propHash)
     })
 
-  checkRequired(target)
+  //checkRequired(target)
 
   return target
 }
 
-cobble.assert = checkRequired
 
 /**
  * adds a property to the src object or expands the value if it is a decorator
@@ -50,8 +49,8 @@ cobble.assert = checkRequired
  */
 function define(value, key, src, propHash){
   var inSrc = key in src
-    , isRequired = value === descriptors.required
-    , isDescriptor = value instanceof descriptors.Descriptor
+    , isDescriptor = descriptors.isDescriptor(value)
+    , isRequired = descriptors.isRequired(value)
     , prev;
 
   if (isRequired && inSrc) 
@@ -74,14 +73,6 @@ function define(value, key, src, propHash){
   })
 }
 
-function checkRequired(obj){
-  var required = _.keys(_.pick(obj, function(v){ 
-      return v === descriptors.required 
-    }))
-
-  invariant( required.length === 0
-    , "Unmet required properties: %s", required.join(', '))
-}
 
 function add(obj, key, value) {
   obj[key] = _.has(obj, key) ? obj[key] : []

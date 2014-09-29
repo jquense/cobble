@@ -10,15 +10,7 @@ module.exports = _.extend(cobble, descriptors)
  * @return {object}
  */     
 function cobble(){
-  var args = [], last; 
-
-  for(var i = 0; i < arguments.length; ++i) {
-    last = arguments[i];
-    if( _.isArray(last) ) args = args.concat(last)
-    else args[args.length] = last
-  }
-    
-  return  cobble.into({}, args)
+  return cobble.into({}, _.flatten(arguments, true))
 }
 
 /**
@@ -27,33 +19,23 @@ function cobble(){
  * @param  {...objects} object to merge into the target object
  * @return {object}
  */
-cobble.into = function into() {
-  var args = []
-    , propHash = {}
-    , target, last; 
-
-  for(var i = 0; i < arguments.length; ++i) {
-    last = arguments[i];
-    if( _.isArray(last) ) args = args.concat(last)
-    else args[args.length] = last
-  }
-
-  if(args.length === 1)
-    return args[0]
-  
-  target = args.shift()
+cobble.into = function into(_first){
+  var args = _.rest(_.flatten(arguments, true))
+    , target = _first
+    , propHash = {};
 
   for(var i = 0; i < args.length; i++)
-    for(var key in args[i]) {
-      var value = args[i][key]
-        , inTarget   = key in target
+    _.each(args[i], function(value, key) {
+      var inTarget   = key in target
         , isRequired = descriptors.isRequired(value);
 
-      if ( !isRequired && inTarget && ( !_.has(propHash, key) || propHash[key].indexOf(target[key]) === -1 )) 
-        add(propHash, key, target[key])
+      if ( !isRequired && inTarget && ( !propHash[key] || !_.contains(propHash[key], target[key]) )) 
+          add(propHash, key, target[key])
 
       define(value, key, target, propHash)
-    }
+    })
+
+  //checkRequired(target)
 
   return target
 }
@@ -74,23 +56,29 @@ cobble.assert = function (obj){
  * @param  {object} src
  */
 function define(value, key, src, propHash){
-  var isDescriptor = descriptors.isDescriptor(value)
+  var inSrc = key in src
+    , isDescriptor = descriptors.isDescriptor(value)
     , isRequired = descriptors.isRequired(value)
     , prev;
 
-  if (isRequired && (key in src)) return
+  if (isRequired && inSrc) 
+    return
 
   if ( !isRequired ) {
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
-      //value = value.resolve.call(src, key, prev)
       return define(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
       add(propHash, key, value)
   }
 
-  src[key] = value
+  Object.defineProperty(src, key, {
+    enumerable: true, 
+    writable: true, 
+    configurable: true,
+    value: value
+  })
 }
 
 

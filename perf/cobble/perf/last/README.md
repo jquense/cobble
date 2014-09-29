@@ -1,13 +1,9 @@
 Cobble
 ========
 
-Tiny composition lib for doing easy object mixins. The point of Cobble is to add minimal sugar to doing normal Object and Function composition. It is something like Traits, except that conflicts are overridden by default. Cobble works out to being fairly useful as the underpinnings for mixin systems for other object models, as it provides a robust and straightforward way to handle multiple conflicts when merging objects together.
+tiny composition lib for doing easy object mixins. The point of Cobble is to add minimal sugar to doing normal Object and Function composition. It is something like Traits, except that conflicts are overridden by default. Cobble works out to being fairly useful as the underpinnings for mixin systems for other object models, as it provides a robust and straightforward way to handle multiple conflicts when merging objects together.
 
 If you are looking for a more complete object model wrapper try: [Clank](https://github.com/theporchrat/clank) which uses cobble internally.
-
-## Changes in v1.1.2
-
-- performance improvements
 
 ## Changes in v1.1.0
 

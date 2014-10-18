@@ -1,3 +1,4 @@
+'use strict';
 var _ = require('lodash')
   , invariant = require('./lib/invariant')
   , descriptors = require('./lib/descriptors')
@@ -8,16 +9,16 @@ module.exports = _.extend(cobble, descriptors)
  * compose objects into a new object, leaving the original objects untouched
  * @param {...object} an object to be composed.
  * @return {object}
- */     
+ */
 function cobble(){
-  var args = [], last; 
+  var args = [], last;
 
   for(var i = 0; i < arguments.length; ++i) {
     last = arguments[i];
     if( _.isArray(last) ) args = args.concat(last)
     else args[args.length] = last
   }
-    
+
   return  cobble.into({}, args)
 }
 
@@ -30,7 +31,7 @@ function cobble(){
 cobble.into = function into() {
   var args = []
     , propHash = {}
-    , target, last; 
+    , target, last;
 
   for(var i = 0; i < arguments.length; ++i) {
     last = arguments[i];
@@ -40,7 +41,7 @@ cobble.into = function into() {
 
   if(args.length === 1)
     return args[0]
-  
+
   target = args.shift()
 
   for(var i = 0; i < args.length; i++)
@@ -49,23 +50,23 @@ cobble.into = function into() {
         , inTarget   = key in target
         , isRequired = descriptors.isRequired(value);
 
-      if ( !isRequired && inTarget && ( !_.has(propHash, key) || propHash[key].indexOf(target[key]) === -1 )) 
+      if ( !isRequired && inTarget && ( !_.has(propHash, key) || propHash[key].indexOf(target[key]) === -1 ))
         add(propHash, key, target[key])
 
-      define(value, key, target, propHash)
+      defineKey(value, key, target, propHash)
     }
 
   return target
 }
 
-cobble.assert = function (obj){    
-  var required = _.keys(_.pick(obj, descriptors.isRequired))    
-   
+cobble.assert = function (obj){
+  var required = _.keys(_.pick(obj, descriptors.isRequired))
+
   if( required.length !== 0 ){
     var err = new TypeError("Unmet required properties: " + required.join(', '))
     err.required = required
     throw err
-  }    
+  }
 }
 /**
  * adds a property to the src object or expands the value if it is a decorator
@@ -73,7 +74,7 @@ cobble.assert = function (obj){
  * @param  {string} key
  * @param  {object} src
  */
-function define(value, key, src, propHash){
+function defineKey(value, key, src, propHash){
   var isDescriptor = descriptors.isDescriptor(value)
     , isRequired = descriptors.isRequired(value)
     , prev;
@@ -84,7 +85,7 @@ function define(value, key, src, propHash){
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
       //value = value.resolve.call(src, key, prev)
-      return define(value.resolve.call(src, key, prev), key, src, propHash)
+      return defineKey(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
       add(propHash, key, value)

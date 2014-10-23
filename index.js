@@ -1,8 +1,8 @@
 'use strict';
-var _ = require('lodash')
-  , descriptors = require('./lib/descriptors')
+var extend = require('xtend/mutable')
+  , descriptors = require('./lib/descriptors');
 
-module.exports = _.extend(cobble, descriptors)
+module.exports = extend(cobble, descriptors)
 
 /**
  * compose objects into a new object, leaving the original objects untouched
@@ -14,7 +14,7 @@ function cobble(){
 
   for(var i = 0; i < arguments.length; ++i) {
     last = arguments[i];
-    if( _.isArray(last) ) args = args.concat(last)
+    if( isArray(last) ) args = args.concat(last)
     else args[args.length] = last
   }
 
@@ -34,7 +34,7 @@ cobble.into = function into() {
 
   for(var i = 0; i < arguments.length; ++i) {
     last = arguments[i];
-    if( _.isArray(last) ) args = args.concat(last)
+    if( isArray(last) ) args = args.concat(last)
     else args[args.length] = last
   }
 
@@ -49,7 +49,7 @@ cobble.into = function into() {
         , inTarget   = key in target
         , isRequired = descriptors.isRequired(value);
 
-      if ( !isRequired && inTarget && ( !_.has(propHash, key) || propHash[key].indexOf(target[key]) === -1 ))
+      if ( !isRequired && inTarget && ( !propHash.hasOwnProperty(key) || propHash[key].indexOf(target[key]) === -1 ))
         add(propHash, key, target[key])
 
       defineKey(value, key, target, propHash)
@@ -59,7 +59,11 @@ cobble.into = function into() {
 }
 
 cobble.assert = function (obj){
-  var required = _.keys(_.pick(obj, descriptors.isRequired))
+  var required = []
+
+  for (var k in obj)
+    if( obj.hasOwnProperty(k) && descriptors.isRequired(obj[k]))
+      required.push(k)
 
   if( required.length !== 0 ){
     var err = new TypeError("Unmet required properties: " + required.join(', '))
@@ -93,6 +97,10 @@ function defineKey(value, key, src, propHash){
 }
 
 function add(obj, key, value) {
-  obj[key] = _.has(obj, key) ? obj[key] : []
+  obj[key] = obj.hasOwnProperty(key) ? obj[key] : []
   obj[key].push(value)
+}
+
+function isArray(arg) {
+  return Array.isArray ? Array.isArray(arg) : Object.prototype.toString.call(arg) === '[object Array]';
 }

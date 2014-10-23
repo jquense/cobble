@@ -25,7 +25,8 @@
   },
   "homepage": "https://github.com/theporchrat/cobble",
   "dependencies": {
-    "lodash": "^2.4.1"
+    "array-reduce": "0.0.0",
+    "xtend": "^4.0.0"
   },
   "devDependencies": {
     "sinon-chai": "^2.5.0",

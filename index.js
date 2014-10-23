@@ -86,7 +86,7 @@ function defineKey(value, key, src, propHash){
 
   if ( !isRequired ) {
     if ( isDescriptor) {
-      prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
+      prev = (propHash.hasOwnProperty(key) ? propHash[key] : []).splice(0)
       return defineKey(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else

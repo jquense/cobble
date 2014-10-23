@@ -1,6 +1,5 @@
 'use strict';
 var _ = require('lodash')
-  , invariant = require('./lib/invariant')
   , descriptors = require('./lib/descriptors')
 
 module.exports = _.extend(cobble, descriptors)
@@ -44,7 +43,7 @@ cobble.into = function into() {
 
   target = args.shift()
 
-  for(var i = 0; i < args.length; i++)
+  for( i = 0; i < args.length; i++)
     for(var key in args[i]) {
       var value = args[i][key]
         , inTarget   = key in target
@@ -76,7 +75,7 @@ cobble.assert = function (obj){
  */
 function defineKey(value, key, src, propHash){
   var isDescriptor = descriptors.isDescriptor(value)
-    , isRequired = descriptors.isRequired(value)
+    , isRequired   = descriptors.isRequired(value)
     , prev;
 
   if (isRequired && (key in src)) return
@@ -84,7 +83,6 @@ function defineKey(value, key, src, propHash){
   if ( !isRequired ) {
     if ( isDescriptor) {
       prev = (propHash[key] || []).splice(0) //assume this descriptor is resolving all of the conflicts
-      //value = value.resolve.call(src, key, prev)
       return defineKey(value.resolve.call(src, key, prev), key, src, propHash)
     }
     else
@@ -94,10 +92,7 @@ function defineKey(value, key, src, propHash){
   src[key] = value
 }
 
-
 function add(obj, key, value) {
   obj[key] = _.has(obj, key) ? obj[key] : []
   obj[key].push(value)
 }
-
-

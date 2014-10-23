@@ -5,6 +5,10 @@ Tiny composition lib for doing easy object mixins. The point of Cobble is to add
 
 If you are looking for a more complete object model wrapper try: [Clank](https://github.com/theporchrat/clank) which uses cobble internally.
 
+## Changes in v2.0.0
+
+- remove `provided()` descriptor
+
 ## Changes in v1.1.2
 
 - performance improvements

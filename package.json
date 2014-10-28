@@ -1,6 +1,6 @@
 {
   "name": "cobble",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "tiny object composition utils useful as a mixin system, or shoes",
   "main": "index.js",
   "scripts": {
@@ -29,13 +29,14 @@
     "xtend": "^4.0.0"
   },
   "devDependencies": {
-    "sinon-chai": "^2.5.0",
+    "benchmark": "~1.0.0",
     "chai": "^1.9.1",
-    "sinon": "^1.10.3",
-    "mocha": "^1.21.4",
-    "gulp-mocha": "^1.0.0",
     "gulp": "^3.8.7",
+    "gulp-mocha": "^1.0.0",
     "gulp-plumber": "~0.6.5",
-    "benchmark": "~1.0.0"
+    "lodash": "^2.4.1",
+    "mocha": "^1.21.4",
+    "sinon": "^1.10.3",
+    "sinon-chai": "^2.5.0"
   }
 }

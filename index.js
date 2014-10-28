@@ -101,6 +101,6 @@ function add(obj, key, value) {
   obj[key].push(value)
 }
 
-function isArray(arg) {
-  return Array.isArray ? Array.isArray(arg) : Object.prototype.toString.call(arg) === '[object Array]';
+var isArray = Array.isArray || function(arg) {
+  return Object.prototype.toString.call(arg) === '[object Array]';
 }
